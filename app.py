@@ -3,8 +3,7 @@ import requests
 
 app = Flask(__name__)
 
-API_KEY = "your_openweathermap_api_key"  # 🔑 Replace with your actual API key
-
+API_KEY = "your_openweathermap_api_key"  # 🔑 Replace with your real API key
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -15,26 +14,22 @@ def index():
         if city:
             url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
             response = requests.get(url)
-            data = response.json()
-
-            if data.get("cod") == 200:
+            if response.status_code == 200:
+                data = response.json()
                 weather = {
                     "city": data["name"],
                     "temperature": data["main"]["temp"],
                     "description": data["weather"][0]["description"],
-                    "icon": data["weather"][0]["icon"],
                 }
             else:
-                error = "City not found. Please try again."
-
+                error = "City not found."
+        else:
+            error = "Please enter a city name."
     return render_template("index.html", weather=weather, error=error)
-
 
 @app.route("/health")
 def health():
-    return "✅ App is running fine! (Updated 🚀)"  # 🔥 Small change here for test commit
-
+    return {"status": "ok", "message": "App is running!"}
 
 if __name__ == "__main__":
     app.run(debug=True)
-
